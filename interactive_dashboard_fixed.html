@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Global Health & Life Expectancy Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.1/plotly.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#f5f5f5;color:#333;padding:16px}
+    h1{text-align:center;font-size:20px;font-weight:700;margin-bottom:4px;color:#1a1a1a}
+    .subtitle{text-align:center;font-size:13px;color:#666;margin-bottom:20px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1200px;margin:0 auto}
+    .panel{background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.10)}
+    .panel-title{font-size:13px;font-weight:600;color:#444;margin-bottom:10px;text-align:center}
+    .chart{width:100%;height:260px}
+    .legend-row{display:flex;justify-content:center;gap:18px;margin-top:8px;flex-wrap:wrap}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#555}
+    .legend-dot{width:11px;height:11px;border-radius:50%}
+    .footer{text-align:center;font-size:11px;color:#aaa;margin-top:18px}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>🌍 Global Health &amp; Life Expectancy — Interactive Dashboard</h1>
+  <p class="subtitle">WHO Data · 112 Countries · 2000–2015 · Built with Python + Plotly | <strong>Lakshya</strong></p>
+
+  <div class="grid">
+
+    <!-- Panel 1 -->
+    <div class="panel">
+      <div class="panel-title">🌍 Global LE Trend (2000–2015)</div>
+      <div id="p1" class="chart"></div>
+    </div>
+
+    <!-- Panel 2 -->
+    <div class="panel">
+      <div class="panel-title">📊 Developed vs Developing</div>
+      <div id="p2" class="chart"></div>
+    </div>
+
+    <!-- Panel 3 -->
+    <div class="panel">
+      <div class="panel-title">🏷️ Life Expectancy Category Split</div>
+      <div id="p3" class="chart"></div>
+    </div>
+
+    <!-- Panel 4 -->
+    <div class="panel">
+      <div class="panel-title">🏆 Top 10 Countries by Avg LE</div>
+      <div id="p4" class="chart"></div>
+    </div>
+
+    <!-- Panel 5 -->
+    <div class="panel">
+      <div class="panel-title">🤖 Model Comparison — Test Accuracy</div>
+      <div id="p5" class="chart"></div>
+    </div>
+
+    <!-- Panel 6 -->
+    <div class="panel">
+      <div class="panel-title">🔮 Prophet Forecast — Developing (2025)</div>
+      <div id="p6" class="chart"></div>
+    </div>
+
+  </div>
+
+  <div class="legend-row" style="margin-top:14px">
+    <span class="legend-item"><span class="legend-dot" style="background:#2196F3"></span>Developed</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#FF5722"></span>Developing</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4CAF50"></span>High LE (&ge;75)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#FFC107"></span>Medium LE (60–75)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#F44336"></span>Low LE (&lt;60)</span>
+  </div>
+  <p class="footer">Hover any chart for exact values &nbsp;·&nbsp; Scroll/zoom inside each panel &nbsp;·&nbsp; Click legend items to toggle traces</p>
+
+<script>
+const CFG = {responsive:true, displayModeBar:false};
+const LAY = {
+  margin:{t:10,b:40,l:48,r:10},
+  paper_bgcolor:'#fff', plot_bgcolor:'#fff',
+  font:{family:'Arial',size:11,color:'#444'},
+  xaxis:{showgrid:true, gridcolor:'#f0f0f0', zeroline:false},
+  yaxis:{showgrid:true, gridcolor:'#f0f0f0', zeroline:false},
+  showlegend:false
+};
+
+/* Panel 1 — Global trend */
+Plotly.newPlot('p1', [{
+  type:'bar', x:[2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015], y:[64.9, 65.12, 65.37, 65.79, 65.88, 66.33, 66.51, 66.78, 67.32, 67.38, 67.7, 67.96, 68.0, 68.45, 68.77, 69.07],
+  marker:{color:[64.9, 65.12, 65.37, 65.79, 65.88, 66.33, 66.51, 66.78, 67.32, 67.38, 67.7, 67.96, 68.0, 68.45, 68.77, 69.07], colorscale:'Blues', showscale:false},
+  hovertemplate:'Year: %{x}<br>Avg LE: %{y:.2f} yrs<extra></extra>'
+}], {...LAY, yaxis:{...LAY.yaxis, title:'Avg LE (yrs)'}}, CFG);
+
+/* Panel 2 — Developed vs Developing */
+Plotly.newPlot('p2', [
+  {type:'bar', name:'Developed',  x:[2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015], y:[79.36, 79.55, 79.74, 79.93, 79.89, 80.07, 80.11, 80.27, 80.58, 80.64, 80.87, 80.83, 80.9, 80.99, 81.1, 81.23],
+    marker:{color:'#2196F3'}, opacity:0.88,
+    hovertemplate:'Developed · %{x}<br>LE: %{y:.2f} yrs<extra></extra>'},
+  {type:'bar', name:'Developing', x:[2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015], y:[61.16, 61.39, 61.66, 62.14, 62.26, 62.77, 62.99, 63.3, 63.89, 63.96, 64.29, 64.63, 64.67, 65.21, 65.58, 65.93],
+    marker:{color:'#FF5722'}, opacity:0.88,
+    hovertemplate:'Developing · %{x}<br>LE: %{y:.2f} yrs<extra></extra>'}
+], {...LAY, barmode:'group', showlegend:true,
+    legend:{orientation:'h',y:-0.18,x:0.5,xanchor:'center',font:{size:10}},
+    yaxis:{...LAY.yaxis, title:'Avg LE (yrs)'}}, CFG);
+
+/* Panel 3 — Donut */
+Plotly.newPlot('p3', [{
+  type:'pie', labels:["Medium", "Low", "High"], values:[824, 517, 451],
+  hole:0.42,
+  marker:{colors:['#4CAF50','#FFC107','#F44336']},
+  hovertemplate:'%{label}<br>Count: %{value}<br>%{percent}<extra></extra>',
+  textinfo:'label+percent', textfont:{size:11}
+}], {...LAY, margin:{t:10,b:10,l:10,r:10}}, CFG);
+
+/* Panel 4 — Top 10 countries */
+Plotly.newPlot('p4', [{
+  type:'bar', orientation:'h',
+  x:[84.72, 84.34, 83.83, 83.56, 83.5, 83.16, 82.29, 81.87, 81.44, 81.21], y:["Japan", "France", "Denmark", "United States of America", "Norway", "Italy", "New Zealand", "Germany", "Switzerland", "Greece"],
+  marker:{color:["#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3", "#2196F3"]},
+  hovertemplate:'%{y}<br>Avg LE: %{x:.1f} yrs<extra></extra>'
+}], {...LAY, margin:{t:10,b:40,l:130,r:40},
+    xaxis:{...LAY.xaxis, title:'Avg LE (yrs)'},
+    yaxis:{...LAY.yaxis, autorange:'reversed'}}, CFG);
+
+/* Panel 5 — Model comparison */
+Plotly.newPlot('p5', [{
+  type:'bar', x:["Logistic Regression", "KNN (k=7)", "Random Forest", "XGBoost"], y:[66.02, 61.84, 61.84, 63.23],
+  marker:{color:["#4CAF50", "#90CAF9", "#90CAF9", "#90CAF9"]},
+  text:["66.02%", "61.84%", "61.84%", "63.23%"],
+  textposition:'outside', textfont:{size:10},
+  hovertemplate:'%{x}<br>Accuracy: %{y:.2f}%<extra></extra>'
+}], {...LAY, yaxis:{...LAY.yaxis, title:'Test Accuracy (%)', range:[0,75]},
+    xaxis:{...LAY.xaxis, tickfont:{size:10}}}, CFG);
+
+/* Panel 6 — Prophet forecast */
+Plotly.newPlot('p6', [
+  {type:'scatter', mode:'lines+markers', name:'Historical',
+    x:[2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015], y:[61.16, 61.39, 61.66, 62.14, 62.26, 62.77, 62.99, 63.3, 63.89, 63.96, 64.29, 64.63, 64.67, 65.21, 65.58, 65.93],
+    line:{color:'#FF5722',width:2.5}, marker:{size:5},
+    hovertemplate:'Year: %{x}<br>LE: %{y:.2f} yrs<extra></extra>'},
+  {type:'scatter', mode:'lines+markers', name:'Forecast',
+    x:[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], y:[66.59, 66.93, 67.28, 67.62, 67.97, 68.31, 68.66, 69.0, 69.35],
+    line:{color:'#FF5722',width:2.5,dash:'dash'}, marker:{size:5},
+    hovertemplate:'Year: %{x}<br>Forecast: %{y:.2f} yrs<extra></extra>'},
+  {type:'scatter', fill:'toself', name:'90% CI',
+    x:[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016], y:[66.78, 67.2, 67.64, 68.12, 68.6, 69.1, 69.65, 70.16, 70.71, 67.99, 67.8, 67.66, 67.52, 67.31, 67.14, 66.93, 66.69, 66.42],
+    fillcolor:'rgba(255,87,34,0.15)',
+    line:{color:'rgba(0,0,0,0)'},
+    hoverinfo:'skip'}
+], {...LAY, showlegend:true,
+    legend:{orientation:'h',y:-0.18,x:0.5,xanchor:'center',font:{size:10}},
+    yaxis:{...LAY.yaxis, title:'Avg LE (yrs)'}}, CFG);
+</script>
+</body>
+</html>
